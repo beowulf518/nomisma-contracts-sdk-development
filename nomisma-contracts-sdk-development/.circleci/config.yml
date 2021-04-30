@@ -1,0 +1,110 @@
+defaults: &defaults
+  docker:
+    - image: tushar00jain/circleci-node:10.15.0
+
+version: 2.1
+
+commands:
+  publish_npm:
+    parameters:
+      tag_suffix:
+        type: string
+    steps:
+      - run:
+          name: release
+          command: |
+            git config user.email "bot@nomisma.one"
+            git config user.name "Nomisma Bot"
+            mv .circleci/npm/.npmrc .
+
+            yarn global add semver
+
+            last_version=$(git tag -l | grep << parameters.tag_suffix >> | sort -V | tail -1)
+
+            next_version=$(/home/circleci/.yarn/bin/semver ${last_version} -i prerelease --preid << parameters.tag_suffix >>)
+            git tag -a v${next_version} -m ''
+            git push --quiet --tags https://${DEPLOY_GITHUB_TOKEN}@github.com/NomismaTech/${CIRCLE_PROJECT_REPONAME}.git
+            sed -i "s/\"version\": \".*\"/\"version\": \"${next_version}\"/" package.json
+            npm publish
+
+jobs:
+  build:
+    <<: *defaults
+    
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-dependency-cache-{{ checksum "yarn.lock" }}
+      - add_ssh_keys:
+          fingerprints:
+            - 43:91:6b:5c:5b:68:a3:b4:a7:db:ce:7f:7f:d1:df:ca
+      - run:
+          name: setup npmrc
+          command: |
+            mv .circleci/npm/.npmrc .
+      - run:
+          name: yarn install
+          command: |
+            yarn install --no-optional --pure-lockfile
+      - save_cache:
+          key: v1-dependency-cache-{{ checksum "yarn.lock" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: yarn test
+          command: |
+            yarn test
+      - run:
+          name: build
+          command: |
+            yarn build
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - lib
+            - src
+
+  release:
+    <<: *defaults
+
+    parameters:
+      tag_suffix:
+        type: string
+
+    steps:
+      - checkout
+
+      - attach_workspace:
+          at: .
+
+      - restore_cache:
+          key: v1-dependency-cache-{{ checksum "yarn.lock" }}
+
+      - publish_npm:
+          tag_suffix: << parameters.tag_suffix >>
+
+workflows:
+  version: 2.1
+  build_and_release:
+    jobs:
+      - build:
+          context: read
+      - release:
+          context: write
+          tag_suffix: "dev"
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - development
+      - release:
+          context: write
+          tag_suffix: "prod"
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - production

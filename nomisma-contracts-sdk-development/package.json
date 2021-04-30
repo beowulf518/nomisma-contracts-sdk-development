@@ -1,0 +1,43 @@
+{
+  "name": "@nomisma/nomisma-contracts-sdk",
+  "version": "0.6.0",
+  "description": "",
+  "main": "lib/index.js",
+  "module": "src/index.js",
+  "browser": "src/index.js",
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "files": [
+    "lib",
+    "src"
+  ],
+  "scripts": {
+    "lint:js": "eslint --ext .js .",
+    "lint": "yarn lint:js",
+    "test": "yarn lint",
+    "build": "babel src --out-dir lib",
+    "prepublish": "yarn rimraf ./lib && yarn build"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "peerDependencies": {
+    "web3": "1.0.0-beta.53"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.3.1",
+    "eslint": "^5.12.1",
+    "jest": "^24.0.0",
+    "rimraf": "^2.6.3",
+    "web3": "1.0.0-beta.53"
+  },
+  "dependencies": {
+    "@makerdao/multicall": "0.8.0",
+    "@nomisma/eslint-config-shared": "^0.1.0-dev.5",
+    "@nomisma/nomisma-smart-contract-helpers": "0.3.0-dev.20",
+    "ethers": "^4.0.27"
+  }
+}

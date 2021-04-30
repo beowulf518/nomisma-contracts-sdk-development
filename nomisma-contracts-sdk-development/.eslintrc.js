@@ -1,0 +1,22 @@
+module.exports = {
+  'extends': '@nomisma/eslint-config-shared',
+  'globals': {
+    '__DEV__': true,
+    'PRODUCTION': true,
+    'PORT': true,
+    'BASE_API_URL': true,
+    'OPM_BID_EVENT_NAME': true,
+    'OPM_PAIRED_EVENT_NAME': true,
+    'OPM_BID_WITHDRAWN_EVENT_NAME': true,
+    'OPM_TRANSACTION_SETTLED_EVENT_NAME': true,
+    'OPM_REDEEM_AVAILABLE_EVENT_NAME': true,
+    'OPM_TOKENS_REDEEMED_EVENT_NAME': true,
+    'BANK_EQUITY_TOKENS_ISSUED_EVENT_NAME': true,
+    'BANK_DEBT_TOKENS_ISSUED_EVENT_NAME': true,
+    'BANK_LOAN_PAYBACK_EVENT_NAME': true,
+    'BANK_BORROWED_EVENT_NAME': true,
+    'DEBT_REDEEMED_EVENT_NAME': true,
+    'EQUITY_REDEEMED_EVENT_NAME': true,
+    'BigInt':true,
+  },
+};
